@@ -1,0 +1,106 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #0f1115;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: Montserrat, sans-serif;
+  background: #0f1115;
+  color: white;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.navigation {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #11141c;
+}
+
+.navigation input,
+.navigation select {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+}
+
+.canvas {
+  position: relative;
+}
+
+.drawer-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 40px;
+  height: 80px;
+  background: #1f2432;
+  border-radius: 40px 0 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.drawer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: #11141c;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  z-index: 9;
+}
+
+.drawer.open {
+  width: 320px;
+}
+
+.tabs {
+  display: flex;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: white;
+}
+
+.tabs .active {
+  background: #1f2432;
+}
+
+.drawer-content {
+  padding: 12px;
+}
+
+.module-card {
+  display: flex;
+  gap: 10px;
+  background: #1a1f2c;
+  padding: 10px;
+  border-radius: 8px;
+}
