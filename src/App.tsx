@@ -523,10 +523,10 @@ const App = () => {
         color: themeColors.text,
         display: "flex",
         flexDirection: "column",
-        transform: isMobile ? "scale(.75)" : undefined,
+        transform: isMobile ? "scale(.67)" : undefined,
         transformOrigin: "top left",
-        width: isMobile ? "134vw" : "100vw",
-        height: isMobile ? "134vh" : "100vh",
+        width: isMobile ? "150vw" : "100vw",
+        height: isMobile ? "150vh" : "100vh",
       }}
     >
       <div
