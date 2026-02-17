@@ -104,3 +104,32 @@ body,
   padding: 10px;
   border-radius: 8px;
 }
+
+@keyframes poof {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Stretch out slowly */
+  20% {
+    transform: scale(1.1, 1.1); /* Slow, bigger stretch */
+  }
+
+  /* Shrink with rapid snap */
+  40% {
+    transform: scale(0.7, 0.7); /* Shrinking rapidly */
+    opacity: 0.6;
+  }
+
+  /* Implode completely */
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.module-poof {
+  animation: poof 0.4s cubic-bezier(0.13, 1, 0.32, 1) forwards;
+  transform-origin: center;
+}

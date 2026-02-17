@@ -94,6 +94,8 @@ describe("<Grid />", () => {
         onMoveModule={onMoveModule}
         onRemoveModule={onRemoveModule}
         onCellSizeChange={onCellSizeChange}
+        gridCols={8}
+        gridRows={4}
       />,
     );
 
@@ -110,6 +112,8 @@ describe("<Grid />", () => {
         onMoveModule={onMoveModule}
         onRemoveModule={onRemoveModule}
         onCellSizeChange={onCellSizeChange}
+        gridCols={8}
+        gridRows={4}
       />,
     );
 
@@ -126,6 +130,8 @@ describe("<Grid />", () => {
         onMoveModule={onMoveModule}
         onRemoveModule={onRemoveModule}
         onCellSizeChange={onCellSizeChange}
+        gridCols={8}
+        gridRows={4}
       />,
     );
 
@@ -140,6 +146,7 @@ describe("<Grid />", () => {
   });
 
   test("opens menu and removes module", () => {
+    jest.useFakeTimers();
     render(
       <Grid
         active={true}
@@ -148,6 +155,8 @@ describe("<Grid />", () => {
         onMoveModule={onMoveModule}
         onRemoveModule={onRemoveModule}
         onCellSizeChange={onCellSizeChange}
+        gridCols={8}
+        gridRows={4}
       />,
     );
 
@@ -161,7 +170,13 @@ describe("<Grid />", () => {
 
     fireEvent.click(screen.getByText("Remove"));
 
+    // Wait for poof animation timeout
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+
     expect(onRemoveModule).toHaveBeenCalledWith("mod1");
+    jest.useRealTimers();
   });
 
   test("handles drag start on long press", () => {
@@ -177,6 +192,8 @@ describe("<Grid />", () => {
         onCellSizeChange={onCellSizeChange}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
+        gridCols={8}
+        gridRows={4}
       />,
     );
 

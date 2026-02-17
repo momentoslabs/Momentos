@@ -10,6 +10,7 @@ const ModuleCard = ({
   onAdd,
   showAddButton,
   customColors,
+  isInGrid = false,
 }: ModuleCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const colors = getThemeColors(customColors);
@@ -44,9 +45,60 @@ const ModuleCard = ({
         border: `1px solid ${borderColor}`,
         transition: "all 0.2s ease",
         fontFamily: "Montserrat, sans-serif",
+        opacity: isInGrid ? 0.7 : 1,
+        cursor: isInGrid ? "not-allowed" : undefined,
+        userSelect: "none",
+        WebkitUserSelect: "none",
+        MozUserSelect: "none",
+        msUserSelect: "none",
       }}
+      title={isInGrid ? "Module already in grid" : undefined}
     >
-      <div style={{ flex: 1 }}>
+      <div
+        onMouseDown={(e) => {
+          if (isInGrid) return;
+          if (onDragStart) {
+            e.preventDefault();
+            setIsDragging(true);
+            onDragStart({ data: module });
+          }
+        }}
+        onMouseOut={(e) => {
+          setIsDragging(false);
+        }}
+        style={{
+          flex: 1,
+          cursor: isInGrid ? "not-allowed" : onDragStart ? "grab" : "default",
+          opacity: isDragging ? 0.5 : 1,
+          transform: isDragging ? "scale(0.95)" : "scale(1)",
+          pointerEvents: isInGrid ? "none" : undefined,
+        }}
+        onMouseEnter={(e) => {
+          if (isInGrid) {
+            e.currentTarget.style.cursor = "not-allowed";
+            e.currentTarget.style.setProperty(
+              "cursor",
+              "not-allowed",
+              "important",
+            );
+            e.currentTarget.title = "Module already in grid";
+            return;
+          }
+          if (!isDragging && onDragStart) {
+            e.currentTarget.style.transform = "scale(1.02)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (isInGrid) {
+            e.currentTarget.style.cursor = "not-allowed";
+            e.currentTarget.title = "Module already in grid";
+            return;
+          }
+          if (!isDragging) {
+            e.currentTarget.style.transform = "scale(1)";
+          }
+        }}
+      >
         {/* ...existing code for preview, name, description... */}
         {/* Preview image logic and text content remain unchanged */}
         {/* ...existing code... */}
@@ -77,12 +129,16 @@ const ModuleCard = ({
             </span>
           )}
         </div>
-        <div style={{ marginBottom: 4 }}>
+        <div style={{ marginBottom: 4, userSelect: "none", WebkitUserSelect: "none", MozUserSelect: "none", msUserSelect: "none" }}>
           <span
             style={{
               fontSize: 14,
               color: textColor,
               fontFamily: "Montserrat, sans-serif",
+              userSelect: "none",
+              WebkitUserSelect: "none",
+              MozUserSelect: "none",
+              msUserSelect: "none",
             }}
           >
             {showFullName ? module.name : truncate(module.name, 32)}
@@ -97,6 +153,10 @@ const ModuleCard = ({
                   cursor: "pointer",
                   textDecoration: "underline",
                   fontFamily: "inherit",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  msUserSelect: "none",
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -117,6 +177,10 @@ const ModuleCard = ({
               padding: "2px 6px",
               borderRadius: 4,
               fontFamily: "Montserrat, sans-serif",
+              userSelect: "none",
+              WebkitUserSelect: "none",
+              MozUserSelect: "none",
+              msUserSelect: "none",
             }}
           >
             {module.size}
@@ -129,6 +193,10 @@ const ModuleCard = ({
             margin: 0,
             color: textColor,
             fontFamily: "Montserrat, sans-serif",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+            MozUserSelect: "none",
+            msUserSelect: "none",
           }}
         >
           {showFullDesc ? module.description : truncate(module.description, 64)}
@@ -143,6 +211,10 @@ const ModuleCard = ({
                 cursor: "pointer",
                 textDecoration: "underline",
                 fontFamily: "inherit",
+                userSelect: "none",
+                WebkitUserSelect: "none",
+                MozUserSelect: "none",
+                msUserSelect: "none",
               }}
               onClick={(e) => {
                 e.stopPropagation();
@@ -193,7 +265,7 @@ const ModuleCard = ({
               <Icon name="trash" color={colors.error} size={16} />
             </div>
           )}
-          {showAddButton && onAdd && (
+          {showAddButton && onAdd && !isInGrid && (
             <div
               onClick={(e) => {
                 e.stopPropagation();
@@ -223,6 +295,27 @@ const ModuleCard = ({
               }}
             >
               + Add
+            </div>
+          )}
+          {showAddButton && isInGrid && (
+            <div
+              style={{
+                padding: "4px 10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 11,
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
+                borderRadius: 4,
+                backgroundColor: cardBg,
+                opacity: 0.5,
+                fontFamily: "Montserrat, sans-serif",
+                cursor: "not-allowed",
+              }}
+              title="Module already in grid"
+            >
+              Already in grid
             </div>
           )}
         </div>

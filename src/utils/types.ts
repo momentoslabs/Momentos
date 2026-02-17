@@ -61,6 +61,8 @@ export interface GridProps {
   } | null;
   onDragStart?: (drag: any) => void;
   onDragEnd?: () => void;
+  gridCols: number;
+  gridRows: number;
 }
 
 export interface IconProps {
@@ -129,6 +131,7 @@ export interface ModuleCardProps {
   onRemove?: () => void;
   onAdd?: () => void;
   showAddButton?: boolean;
+  isInGrid?: boolean;
   customColors?: {
     background?: string;
     primaryBorder?: string;

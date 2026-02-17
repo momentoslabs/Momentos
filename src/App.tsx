@@ -7,14 +7,15 @@ import type {
 } from "./utils/types";
 import {
   DEFAULT_CELL_SIZE,
-  GRID_COLS,
-  GRID_ROWS,
+  GRID_COLS as BASE_GRID_COLS,
+  GRID_ROWS as BASE_GRID_ROWS,
   MODULE_REGISTRY_URL,
   SIZE_GRID_UNITS,
 } from "./utils/constants";
 import { wouldOverlap } from "./utils/functions";
 import { getThemeColors } from "./utils/colors";
 import Grid from "./components/Grid/Grid";
+// (removed duplicate useRef import)
 import Navigation from "./components/Navigation/Navigation";
 import ModuleDrawer from "./components/ModuleDrawer/ModuleDrawer";
 import SettingsModal from "./components/SettingsModal/SettingsModal";
@@ -61,6 +62,10 @@ const App = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Swap grid cols/rows if mobile
+  const gridCols = isMobile ? BASE_GRID_ROWS : BASE_GRID_COLS;
+  const gridRows = isMobile ? BASE_GRID_COLS : BASE_GRID_ROWS;
 
   // Calculate the translation amount whenever the window resizes or component's width changes
   useEffect(() => {
@@ -254,8 +259,8 @@ const App = () => {
     if (
       gridPosition.col < 0 ||
       gridPosition.row < 0 ||
-      gridPosition.col + cols > GRID_COLS ||
-      gridPosition.row + rows > GRID_ROWS
+      gridPosition.col + cols > gridCols ||
+      gridPosition.row + rows > gridRows
     ) {
       return;
     }
@@ -329,8 +334,8 @@ const App = () => {
       if (
         gridPosition.col < 0 ||
         gridPosition.row < 0 ||
-        gridPosition.col + cols > GRID_COLS ||
-        gridPosition.row + rows > GRID_ROWS
+        gridPosition.col + cols > gridCols ||
+        gridPosition.row + rows > gridRows
       ) {
         return prev;
       }
@@ -481,8 +486,32 @@ const App = () => {
     setMyModules(myModules.filter((url) => url !== moduleUrl));
   };
 
+  // Remove all instances of a module from the grid by moduleUrl
+  // Ref to call poof animation on Grid
+  const gridRef = useRef<any>(null);
+  const handleRemoveModuleFromGrid = async (
+    moduleUrl: string,
+    opts?: { poof?: boolean },
+  ) => {
+    if (
+      opts &&
+      opts.poof &&
+      gridRef.current &&
+      gridRef.current.poofModuleByUrl
+    ) {
+      await gridRef.current.poofModuleByUrl(moduleUrl);
+      setPlacedModules((prev) =>
+        prev.filter((m) => m.data.moduleUrl !== moduleUrl),
+      );
+    } else {
+      setPlacedModules((prev) =>
+        prev.filter((m) => m.data.moduleUrl !== moduleUrl),
+      );
+    }
+  };
+
   const themeColors = getThemeColors(customColors);
-  const gridWidth = cellSize * GRID_COLS;
+  const gridWidth = cellSize * gridCols;
 
   return (
     <div
@@ -494,10 +523,10 @@ const App = () => {
         color: themeColors.text,
         display: "flex",
         flexDirection: "column",
-        transform: isMobile ? "scale(0.40)" : undefined,
+        transform: isMobile ? "scale(.75)" : undefined,
         transformOrigin: "top left",
-        width: isMobile ? "250vw" : "100vw",
-        height: isMobile ? "250vh" : "100vh",
+        width: isMobile ? "134vw" : "100vw",
+        height: isMobile ? "134vh" : "100vh",
       }}
     >
       <div
@@ -529,6 +558,7 @@ const App = () => {
           />
           {/* Module Grid */}
           <Grid
+            ref={gridRef}
             modules={placedModules}
             onDropModule={handleDropModule}
             onMoveModule={handleMoveModule}
@@ -540,6 +570,8 @@ const App = () => {
             draggingModule={draggingModule}
             onDragStart={setDraggingModule}
             onDragEnd={() => setDraggingModule(null)}
+            gridCols={gridCols}
+            gridRows={gridRows}
           />
         </div>
       </div>
@@ -556,9 +588,11 @@ const App = () => {
         customColors={customColors}
         onAddModule={handleAddModule}
         onRemoveModule={handleRemoveMyModule}
+        onRemoveModuleFromGrid={handleRemoveModuleFromGrid}
         onClearGrid={handleClearLayout}
         onLoadFromFile={handleUploadLayout}
         onSaveToFile={handleDownloadLayout}
+        placedModules={placedModules}
       />
 
       {/* Settings Modal */}

@@ -82,7 +82,7 @@ const RemoteModuleRenderer = ({
         } else {
         }
       } catch (e) {
-        console.error("❌ Failed to execute module:", e);
+        console.error("Failed to execute module:", e);
         setError(e instanceof Error ? e.message : "Unknown error");
       }
     }
@@ -166,7 +166,7 @@ const ModuleContent = ({
         setLoading(false);
       } catch (e) {
         if (!cancelled) {
-          console.error("❌ Failed to load module:", e);
+          console.error("Failed to load module:", e);
           setError(
             `Failed to load module: ${e instanceof Error ? e.message : "Unknown error"}`,
           );

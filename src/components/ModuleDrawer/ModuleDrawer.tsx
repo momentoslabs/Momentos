@@ -1,8 +1,16 @@
 import ModuleCard from "./ModuleCard";
-import { ModuleDrawerProps } from "../../utils/types";
+import { ModuleDrawerProps, PlacedModule } from "../../utils/types";
 import { getThemeColors } from "../../utils/colors";
 import { useState, useEffect, useRef } from "react";
 import Icon from "../Icon/Icon";
+
+interface ModuleDrawerWithGridProps extends ModuleDrawerProps {
+  placedModules?: PlacedModule[];
+  onRemoveModuleFromGrid?: (
+    moduleUrl: string,
+    opts?: { poof?: boolean },
+  ) => void;
+}
 
 const ModuleDrawer = ({
   open,
@@ -18,7 +26,9 @@ const ModuleDrawer = ({
   onAddModule,
   onRemoveModule,
   customColors,
-}: ModuleDrawerProps) => {
+  placedModules,
+  onRemoveModuleFromGrid,
+}: ModuleDrawerWithGridProps) => {
   const [browseQuery, setBrowseQuery] = useState("");
   const [myModulesSearch, setMyModulesSearch] = useState("");
   const [customModuleUrl, setCustomModuleUrl] = useState("");
@@ -46,6 +56,34 @@ const ModuleDrawer = ({
         document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [showActionsMenu]);
+
+  // Track grid module IDs in state, update from placedModules prop, fallback to localStorage only on mount
+  const [gridModuleIds, setGridModuleIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (placedModules && placedModules.length > 0) {
+      setGridModuleIds(
+        placedModules.map((mod) => mod.id?.split("-")[0] || mod.id),
+      );
+    } else if (placedModules && placedModules.length === 0) {
+      setGridModuleIds([]);
+    } else {
+      // Fallback to localStorage only on mount
+      const layoutData = localStorage.getItem("momentos-layout");
+      if (layoutData) {
+        try {
+          const layout = JSON.parse(layoutData);
+          if (Array.isArray(layout.modules)) {
+            setGridModuleIds(
+              layout.modules.map((mod: any) => mod.id?.split("-")[0] || mod.id),
+            );
+          }
+        } catch {
+          setGridModuleIds([]);
+        }
+      }
+    }
+  }, [placedModules]);
 
   // Filter my modules
   const myModulesList = modules
@@ -364,7 +402,19 @@ const ModuleDrawer = ({
                   module={m}
                   onDragStart={onDragStart}
                   customColors={customColors}
-                  onRemove={() => onRemoveModule?.(m.moduleUrl || "")}
+                  onRemove={async () => {
+                    if (
+                      typeof m.moduleUrl === "string" &&
+                      onRemoveModuleFromGrid
+                    ) {
+                      // Trigger poof animation on grid first
+                      onRemoveModuleFromGrid(m.moduleUrl, { poof: true });
+                      // Wait for poof animation duration (match Grid: 500ms)
+                      await new Promise((res) => setTimeout(res, 500));
+                    }
+                    onRemoveModule?.(m.moduleUrl || "");
+                  }}
+                  isInGrid={gridModuleIds.includes(m.id)}
                 />
               ))}
             </div>
@@ -516,10 +566,27 @@ const ModuleDrawer = ({
                 <ModuleCard
                   key={m.id}
                   module={m}
-                  onDragStart={onDragStart}
                   customColors={customColors}
                   showAddButton={!myModules.includes(m.moduleUrl || "")}
                   onAdd={() => onAddModule?.(m.moduleUrl || "")}
+                  isInGrid={gridModuleIds.includes(m.id)}
+                  onDragStart={(drag) => {
+                    // Add to myModules if not already present
+                    if (!myModules.includes(m.moduleUrl || "")) {
+                      if (typeof window !== "undefined") {
+                        // Use localStorage for persistence
+                        const updated = [...myModules, m.moduleUrl || ""];
+                        localStorage.setItem(
+                          "momentos-mymodules",
+                          JSON.stringify(updated),
+                        );
+                      }
+                      // If parent provides a handler, call it
+                      if (onAddModule) onAddModule(m.moduleUrl || "");
+                    }
+                    // Also call parent drag handler
+                    if (onDragStart) onDragStart(drag);
+                  }}
                 />
               ))}
             </div>
