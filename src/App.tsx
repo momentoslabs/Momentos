@@ -65,7 +65,7 @@ const App = () => {
 
   // Swap grid cols/rows if mobile
   const gridCols = isMobile ? BASE_GRID_ROWS : BASE_GRID_COLS;
-  const gridRows = isMobile ? BASE_GRID_COLS : BASE_GRID_ROWS;
+  const gridRows = isMobile ? 6 : BASE_GRID_ROWS;
 
   // Calculate the translation amount whenever the window resizes or component's width changes
   useEffect(() => {
@@ -523,10 +523,10 @@ const App = () => {
         color: themeColors.text,
         display: "flex",
         flexDirection: "column",
-        transform: isMobile ? "scale(.67)" : undefined,
+        transform: isMobile ? "scale(.75)" : undefined,
         transformOrigin: "top left",
-        width: isMobile ? "150vw" : "100vw",
-        height: isMobile ? "150vh" : "100vh",
+        width: isMobile ? "134vw" : "100vw",
+        height: isMobile ? "134vh" : "100vh",
       }}
     >
       <div
